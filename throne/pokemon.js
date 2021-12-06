@@ -5,9 +5,10 @@ const axios = require("axios");
 
 const port = 5000;
 
-app.get("/pokemon/all", (req, res) => {
+app.get("/pokemon/all/:offset/:limit", (req, res) => {
+  const { offset, limit } = req.params;
   axios
-    .get("https://pokeapi.co/api/v2/pokemon?offset=0&limit=9999")
+    .get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}limit=${limit}`)
     .then((response) => res.json(response.data))
 
     .catch((error) => res.status(error.response.status).send("Not found"));
