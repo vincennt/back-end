@@ -12,14 +12,20 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/:lang?", (req, res) => {
   const { lang } = req.params;
-
   app.use(express.static("public"));
-
-  res.render("home", {
-    pageTitle: data[lang].pageTitle,
-    title: data[lang].title,
-    lang,
-  });
+  if (!data[lang]) {
+    res.render("home", {
+      pageTitle: data.fr.pageTitle,
+      title: data.fr.title,
+      lang: "fr",
+    });
+  } else {
+    res.render("home", {
+      pageTitle: data[lang].pageTitle,
+      title: data[lang].title,
+      lang,
+    });
+  }
 
   console.log(req.params);
   //   const lang = req.params;
