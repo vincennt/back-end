@@ -1,38 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Form = () => {
-  const [name, setName] = useState("vincent");
+  const [name, setName] = useState("");
+  const [apiName, setApiName] = useState([]);
+  const [include, setInclude] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/students")
+      .then((response) => response.json())
+      .then((data) => setApiName(data));
+  }, []);
+
+  const prenom = {
+    name,
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(name);
-    fetch("http://localhost:5000/students", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(name),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data));
-  };
-
-  const handleKeyUp = (e) => {
-    if (e.keyCode === 13) {
-      handleSubmit();
+    if (apiName.map((nom) => nom.name).includes(name)) {
+      setName("");
+      getStudents();
+      setInclude(true);
+    } else {
+      console.log("api post");
+      fetch("http://localhost:5000/students", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(prenom),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          getStudents();
+        });
+      setName("");
+      setInclude(false);
     }
   };
 
+  const getStudents = () => {
+    fetch("http://localhost:5000/students")
+      .then((response) => response.json())
+      .then((data) => setApiName(data));
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyUp={handleKeyUp}
-        type="text"
-      ></input>
-      <button type="submit"> Add Name</button>
-    </form>
+    <>
+      {include ? <h1>Ce nom existe déjà</h1> : ""}
+      <form onSubmit={handleSubmit}>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+        ></input>
+      </form>
+      <li>
+        {apiName.map((nom) => (
+          <ul>{nom.name}</ul>
+        ))}
+      </li>
+    </>
   );
 };
 export default Form;
